@@ -1,3 +1,4 @@
+import 'package:adora_location_task/data/location_data.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -33,7 +34,7 @@ class DatabaseService {
           $locationIdColumnName INTEGER PRIMARY KEY AUTOINCREMENT,
           $latitudeColumnName TEXT NOT NULL,
           $longitudeColumnName TEXT NOT NULL,
-          $timeColumnName INTEGER NOT NULL,
+          $timeColumnName INTEGER NOT NULL
           )
           ''');
       },
@@ -51,5 +52,25 @@ class DatabaseService {
       longitudeColumnName: longitude,
       timeColumnName: timeStamp,
     });
+    print("location added");
+  }
+
+  Future<List<LocationData>> getLocation() async {
+    final _db = await database;
+    final data = await _db.query(tableName);
+    print(data);
+    List<LocationData> locations =
+        data
+            .map(
+              (element) => LocationData(
+                id: element[locationIdColumnName] as int,
+                latitude: element[latitudeColumnName] as String,
+                longitude: element[longitudeColumnName] as String,
+                timeStamp: element[timeColumnName] as int,
+              ),
+            )
+            .toList();
+    print(locations);
+    return locations;
   }
 }

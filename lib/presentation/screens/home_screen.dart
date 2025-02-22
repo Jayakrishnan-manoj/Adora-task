@@ -1,4 +1,6 @@
 import 'package:adora_location_task/constants/colors.dart';
+import 'package:adora_location_task/data/location_data.dart';
+import 'package:adora_location_task/domain/services/database_service.dart';
 import 'package:adora_location_task/domain/services/location_service.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
@@ -17,6 +19,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
+        spacing: 10,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: double.infinity,
@@ -66,6 +70,51 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                 ),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15),
+            child: Text(
+              "Logged Locations",
+              style: TextStyle(
+                color: AppColors.primaryColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 20,
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: FutureBuilder(
+                future: DatabaseService.instance.getLocation(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text("Error: ${snapshot.error}"));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text("No location data available."));
+                  }
+                  List<LocationData> data = snapshot.data!;
+                  print(data);
+                  return ListView.builder(
+                    itemCount: data.length,
+                    itemBuilder: (context, index) {
+                      LocationData item = data[index];
+                      print("item is $item");
+                      return Text(
+                        "${item.latitude} " +
+                            "${item.longitude} " +
+                            DateTime.fromMillisecondsSinceEpoch(
+                              item.timeStamp,
+                            ).toString(),
+                      );
+                    },
+                  );
+                },
+              ),
             ),
           ),
         ],
