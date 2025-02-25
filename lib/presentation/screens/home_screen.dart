@@ -1,11 +1,13 @@
 import 'package:adora_location_task/constants/colors.dart';
 import 'package:adora_location_task/data/location_data.dart';
+import 'package:adora_location_task/domain/provider/tracking_provider.dart';
 import 'package:adora_location_task/domain/services/database_service.dart';
 import 'package:adora_location_task/domain/services/location_service.dart';
 import 'package:adora_location_task/presentation/widgets/location_card.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,9 +18,17 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final LocationService _locationService = LocationService.instance;
+  late Future<String> _locationFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _locationFuture = _locationService.getCurrentLocation();
+  }
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       body: Column(
         spacing: 10,
@@ -47,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 Gap(40),
                 FutureBuilder(
-                  future: _locationService.getCurrentLocation(),
+                  future: _locationFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator();
@@ -70,6 +80,33 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     );
                   },
+                ),
+                Gap(20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text(
+                      "Enable Background Tracking",
+                      style: TextStyle(
+                        color: AppColors.whiteColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Consumer<TrackingProvider>(
+                      builder: (context, trackingProvider, child) {
+                        return Switch(
+                          value: trackingProvider.isTrackingEnabled,
+                          onChanged: (value) {
+                            trackingProvider.toggleTracking(value);
+                          },
+                          activeColor: Colors.white,
+                          activeTrackColor: Color(0xFF1DC7AC), // Lighter teal
+                          inactiveThumbColor: Colors.white70,
+                          inactiveTrackColor: Colors.blueGrey.shade700,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -103,7 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return ListView.separated(
                     padding: EdgeInsets.all(0),
                     separatorBuilder: (context, index) {
-                      return SizedBox(height: 15,);
+                      return SizedBox(height: 15);
                     },
                     itemCount: data.length,
                     itemBuilder: (context, index) {
@@ -114,7 +151,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       String formattedTime = DateFormat(
                         'yyyy-MM-dd HH:mm',
                       ).format(dateTime);
-                      return LocationCard(item: item, formattedTime: formattedTime);
+                      return LocationCard(
+                        item: item,
+                        formattedTime: formattedTime,
+                      );
                     },
                   );
                 },
