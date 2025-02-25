@@ -23,12 +23,12 @@ class LocationBackgroundService {
           DatabaseService.instance.addLocation(position, DateTime.now());
 
           if (service is AndroidServiceInstance) {
-            service.invoke('update', {
-              'title': 'Location Tracking Active',
-              'content':
+            await service.setForegroundNotificationInfo(
+              title: 'Location Tracking Active',
+              content:
                   'Lat: ${position.latitude.toStringAsFixed(4)}, '
                   'Long: ${position.longitude.toStringAsFixed(4)}',
-            });
+            );
           }
         }
       } catch (e) {
@@ -50,7 +50,6 @@ class LocationBackgroundService {
     print("inside initializeService");
     final service = FlutterBackgroundService();
 
-
     const AndroidNotificationChannel channel = AndroidNotificationChannel(
       'location_tracker',
       'Location Tracking Service',
@@ -65,27 +64,30 @@ class LocationBackgroundService {
         .resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin
         >()
-        ?.createNotificationChannel(channel).whenComplete((){
+        ?.createNotificationChannel(channel)
+        .whenComplete(() {
           print("resolve notification channel");
         });
 
-    await service.configure(
-      iosConfiguration: IosConfiguration(
-        autoStart: true,
-        onForeground: onStart,
-        onBackground: onIosBackground,
-      ),
-      androidConfiguration: AndroidConfiguration(
-        onStart: onStart,
-        autoStart: true,
-        isForegroundMode: true,
-        notificationChannelId: 'location_tracker',
-        initialNotificationTitle: 'Location Tracking Active',
-        initialNotificationContent: 'Initializing location tracking...',
-        foregroundServiceNotificationId: 888,
-      ),
-    ).whenComplete((){
-      print("configuration done");
-    });
+    await service
+        .configure(
+          iosConfiguration: IosConfiguration(
+            autoStart: true,
+            onForeground: onStart,
+            onBackground: onIosBackground,
+          ),
+          androidConfiguration: AndroidConfiguration(
+            onStart: onStart,
+            autoStart: true,
+            isForegroundMode: true,
+            notificationChannelId: 'location_tracker',
+            initialNotificationTitle: 'Location Tracking Active',
+            initialNotificationContent: 'Initializing location tracking...',
+            foregroundServiceNotificationId: 888,
+          ),
+        )
+        .whenComplete(() {
+          print("configuration done");
+        });
   }
 }
