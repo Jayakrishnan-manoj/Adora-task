@@ -10,26 +10,18 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final prefs = await SharedPreferences.getInstance();
-  bool isTrackingEnabled = prefs.getBool('tracking_enabled') ?? false;
+  // final prefs = await SharedPreferences.getInstance();
+  // bool isTrackingEnabled = prefs.getBool('tracking_enabled') ?? false;
 
-  await requestPermissions();
+  // await requestPermissions();
 
-  if (isTrackingEnabled) {
-    await LocationBackgroundService.initializeService();
-  }
+  // if (isTrackingEnabled) {
+  //   await LocationBackgroundService.initializeService();
+  // }
 
   runApp(const MyApp());
 }
 
-Future<void> requestPermissions() async {
-  await [
-    Permission.locationAlways,
-    Permission.locationWhenInUse,
-    Permission.notification,
-    Permission.ignoreBatteryOptimizations,
-  ].request();
-}
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -40,10 +32,7 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [ChangeNotifierProvider(create: (_) => TrackingProvider())],
       child: MaterialApp(
-        title: 'Flutter Demo',
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        ),
+        title: 'Adora Location Tracker',
         debugShowCheckedModeBanner: false,
         home: HomeScreen(),
       ),

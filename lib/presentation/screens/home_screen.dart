@@ -6,8 +6,11 @@ import 'package:adora_location_task/domain/services/location_service.dart';
 import 'package:adora_location_task/presentation/widgets/location_card.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:shimmer/shimmer.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -28,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       body: Column(
         spacing: 10,
@@ -60,7 +62,18 @@ class _HomeScreenState extends State<HomeScreen> {
                   future: _locationFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return CircularProgressIndicator();
+                      return Shimmer.fromColors(
+                        baseColor: AppColors.primaryColor,
+                        highlightColor: AppColors.whiteColor,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Colors.white38,
+                          ),
+                          height: 150,
+                          width: 280,
+                        ),
+                      );
                     }
                     final String location = snapshot.data!;
                     return Container(
@@ -96,7 +109,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (context, trackingProvider, child) {
                         return Switch(
                           value: trackingProvider.isTrackingEnabled,
-                          onChanged: (value) {
+                          onChanged: (value) async {
+                            if (value) {
+                              await _locationService.requestPermissions();
+                            }
                             trackingProvider.toggleTracking(value);
                           },
                           activeColor: Colors.white,
@@ -107,6 +123,47 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                   ],
+                ),
+                Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.white54),
+                  ),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: const TextStyle(color: Colors.white, fontSize: 14),
+                      children: [
+                        const TextSpan(
+                          text:
+                              "Note: To monitor location changes in the background, enable ",
+                        ),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () {
+                              print("pressed");
+                              //Geolocator.openLocationSettings();
+                              Geolocator.openAppSettings();
+                            },
+                            child: Text(
+                              "Allow Everytime",
+                              style: const TextStyle(
+                                color: Colors.cyanAccent,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const TextSpan(text: " in the location settings."),
+                      ],
+                    ),
+                  ),
                 ),
               ],
             ),

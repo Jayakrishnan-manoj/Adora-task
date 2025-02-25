@@ -47,7 +47,7 @@ class LocationBackgroundService {
 
     service.on('stop').listen((event) {
       print("stopping service");
-      service.stopSelf(); // Correct way to stop the service
+      service.stopSelf(); 
     });
   }
 
