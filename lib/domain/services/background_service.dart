@@ -16,7 +16,7 @@ class LocationBackgroundService {
   static Future<void> onStart(ServiceInstance service) async {
     DartPluginRegistrant.ensureInitialized();
 
-    Timer.periodic(const Duration(minutes: 2), (timer) async {
+    Timer.periodic(const Duration(seconds: 30), (timer) async {
       try {
         final position = await LocationService.instance.getCurrentPosition();
         if (position != null) {
@@ -47,7 +47,7 @@ class LocationBackgroundService {
 
     service.on('stop').listen((event) {
       print("stopping service");
-      service.stopSelf(); 
+      service.stopSelf();
     });
   }
 
@@ -74,6 +74,8 @@ class LocationBackgroundService {
           print("resolve notification channel");
         });
 
+    final position = await LocationService.instance.getCurrentPosition();
+
     await service
         .configure(
           iosConfiguration: IosConfiguration(
@@ -87,7 +89,10 @@ class LocationBackgroundService {
             isForegroundMode: true,
             notificationChannelId: 'location_tracker',
             initialNotificationTitle: 'Location Tracking Active',
-            initialNotificationContent: 'Initializing location tracking...',
+            initialNotificationContent:
+                'Lat: ${position!.latitude.toStringAsFixed(4)}, '
+                'Long: ${position.longitude.toStringAsFixed(4)}',
+
             foregroundServiceNotificationId: 888,
           ),
         )

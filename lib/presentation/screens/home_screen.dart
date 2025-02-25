@@ -112,6 +112,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           onChanged: (value) async {
                             if (value) {
                               await _locationService.requestPermissions();
+                              final enabledSnackBar = SnackBar(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                content: Text('Tracking enabled'),
+                                backgroundColor: Colors.green,
+                                elevation: 10,
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.all(5),
+                              );
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(enabledSnackBar);
+                            } else {
+                              final disabledSnackBar = SnackBar(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                ),
+                                content: Text('Tracking disabled'),
+                                backgroundColor: Colors.red,
+                                elevation: 10,
+                                behavior: SnackBarBehavior.floating,
+                                margin: EdgeInsets.all(5),
+                              );
+                              ScaffoldMessenger.of(
+                                context,
+                              ).showSnackBar(disabledSnackBar);
                             }
                             trackingProvider.toggleTracking(value);
                           },
@@ -145,6 +172,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               "Note: To monitor location changes in the background, enable ",
                         ),
                         WidgetSpan(
+                          alignment: PlaceholderAlignment.middle,
                           child: GestureDetector(
                             onTap: () {
                               print("pressed");
