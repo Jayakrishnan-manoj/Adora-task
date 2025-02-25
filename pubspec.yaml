@@ -36,6 +36,7 @@ dependencies:
   gap: ^3.0.1
   geocoding: ^3.0.0
   geolocator: ^13.0.2
+  intl: ^0.20.2
   path: ^1.9.1
   permission_handler: ^11.4.0
   sqflite: ^2.4.2

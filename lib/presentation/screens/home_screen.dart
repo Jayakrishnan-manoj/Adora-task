@@ -2,8 +2,10 @@ import 'package:adora_location_task/constants/colors.dart';
 import 'package:adora_location_task/data/location_data.dart';
 import 'package:adora_location_task/domain/services/database_service.dart';
 import 'package:adora_location_task/domain/services/location_service.dart';
+import 'package:adora_location_task/presentation/widgets/location_card.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -98,19 +100,21 @@ class _HomeScreenState extends State<HomeScreen> {
                     return Center(child: Text("No location data available."));
                   }
                   List<LocationData> data = snapshot.data!;
-                  print(data);
-                  return ListView.builder(
+                  return ListView.separated(
+                    padding: EdgeInsets.all(0),
+                    separatorBuilder: (context, index) {
+                      return SizedBox(height: 15,);
+                    },
                     itemCount: data.length,
                     itemBuilder: (context, index) {
                       LocationData item = data[index];
-                      print("item is $item");
-                      return Text(
-                        "${item.latitude} " +
-                            "${item.longitude} " +
-                            DateTime.fromMillisecondsSinceEpoch(
-                              item.timeStamp,
-                            ).toString(),
+                      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(
+                        item.timeStamp,
                       );
+                      String formattedTime = DateFormat(
+                        'yyyy-MM-dd HH:mm',
+                      ).format(dateTime);
+                      return LocationCard(item: item, formattedTime: formattedTime);
                     },
                   );
                 },

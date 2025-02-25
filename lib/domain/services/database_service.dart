@@ -57,7 +57,7 @@ class DatabaseService {
 
   Future<List<LocationData>> getLocation() async {
     final _db = await database;
-    final data = await _db.query(tableName);
+    final data = await _db.query(tableName,orderBy: timeColumnName);
     print(data);
     List<LocationData> locations =
         data
